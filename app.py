@@ -12,7 +12,7 @@ app = Flask(__name__)
 
 @app.route('/') 
 def index():
-  return send_file('index.html')
+  return send_file('templates/index.html')
 
 @app.route('/send-text', methods=['POST'])
 def send_text():
