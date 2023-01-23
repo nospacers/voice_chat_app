@@ -1,18 +1,18 @@
 const synth = window.speechSynthesis;
 const responseContainer = document.getElementById('response');
 const btnenable = document.getElementById('btn-enable');
-
-btnenable.addEventListener('click', enableSpeech);
-
 const recognition = new webkitSpeechRecognition() || new SpeechRecognition();
 let finalTranscript = 'You: ';
 let recogstatus = 0;
 let selectedVoice = 0;
+
 recognition.interimResults = false;
 recognition.maxAlternatives = 10;
 recognition.continuous = true;
 recognition.autoGainControl = true;
 recognition.noiseSuppression = true;
+
+btnenable.addEventListener('click', enableSpeech);
 
 populateVoiceList();
 if (typeof speechSynthesis !== 'undefined' && speechSynthesis.onvoiceschanged !== undefined) {
@@ -25,20 +25,19 @@ recognition.onresult = (event) => {
     for (let i = event.resultIndex, len = event.results.length; i < len; i++) {
     
     let transcript = event.results[i][0].transcript;
-    if (event.results[i].isFinal) {
-        finalTranscript += transcript;
-    } else {
-        interimTranscript += transcript;
-    }
+        if (event.results[i].isFinal) {
+            finalTranscript += transcript;
+        } else {
+            interimTranscript += transcript;
+        }
     }
 
     recognition.onstart = () => {
-    //console.log('Speech recognition service disconnected');
-    recogstatus = 1;
+        recogstatus = 1;
     }
 
     recognition.onend = () => {
-    document.getElementById('status').style.backgroundColor = "#000000";
+        document.getElementById('status').style.backgroundColor = "#000000";
     }
 
     recognition.addEventListener('speechend', () => {
@@ -60,8 +59,6 @@ recognition.onresult = (event) => {
         })
         .then(text => {
             console.log(text);
-            //console.log(speechSynthesis.paused);
-            //recognition.abort();
             responseContainer.addEventListener('change', aiSpeak(text));
             
             finalTranscript += text + " ";
@@ -70,19 +67,14 @@ recognition.onresult = (event) => {
             }
             console.log(finalTranscript);
         })
-        //const speech = new SpeechSynthesisUtterance(text);
-              //speechSynthesis.speak(speech)
-        //then(y => document.getElementById("demo").innerHTML = y)
         .catch(error => console.error(error));  // Log any errors to the console
         // Update the page with the response from the Python backend
-        //responseContainer.innerText = text;
     }
 function delay(time) {
     return new Promise(resolve => setTimeout(resolve, time));
 }
 
 function aiSpeak(value) {
-    //recogstatus = 0;
     console.log(selectedVoice);
     setTimeout(() => {
     const voiceSelected = document.getElementById('voiceSelect').value;
@@ -100,18 +92,15 @@ function aiSpeak(value) {
 }
 
 function enableSpeech(){
-    //btnenable.click();
     recognition.start();
     console.log("Speech Recognition Enabled");
     document.getElementById('status').style.backgroundColor = "#008000";
-    //btnenable.style.backgroundColor = "Green";
 }
 
 function disableSpeech(){
     recognition.abort();
     recogstatus = 0;
     console.log(synth.speaking);
-    //enableSpeech();
 }
 
 function checkSpeech(){
