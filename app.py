@@ -6,7 +6,7 @@ from bs4 import BeautifulSoup
 from datetime import date
 from datetime import datetime
 
-openai.api_key = <YOUR OPENAI API KEY HERE>
+openai.api_key = "" #YOUR OPEN AI KEY HERE
 
 app = Flask(__name__)
 
