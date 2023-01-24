@@ -41,17 +41,17 @@ recognition.onresult = (event) => {
     }
 
     recognition.addEventListener('speechend', () => {
-    console.log('Speech has stopped being detected');
+        console.log('Speech has stopped being detected');
     });
 
     finalTranscript+=" ";
 
     // Send the transcript to the Python script      
     
-    fetch('http://127.0.0.1:5000/send-text', {
+    fetch('http://localhost:5000/send-text', {
         method: 'POST',
         mode: 'no-cors',
-        headers: new Headers({'content-type': 'text/html'}),
+        headers: new Headers({'Content-Type': 'text/html'}),
         body: finalTranscript
         })
         .then(response => {
@@ -80,6 +80,7 @@ function aiSpeak(value) {
     utterThis.voice = selectedVoice;
     synth.speak(utterThis);
     
+    console.log("AI: " + textToSpeak);
     console.log("Pending: " + synth.pending + " Speaking: " + synth.speaking);
     
     console.log("Speech Recognition Disabled for Speech Synthesis");
@@ -149,3 +150,4 @@ function populateVoiceList() {
 }
 
 setInterval("checkSpeech()", 1000);
+
