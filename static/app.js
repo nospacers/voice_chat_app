@@ -70,9 +70,6 @@ recognition.onresult = (event) => {
         .catch(error => console.error(error));  // Log any errors to the console
         // Update the page with the response from the Python backend
     }
-function delay(time) {
-    return new Promise(resolve => setTimeout(resolve, time));
-}
 
 function aiSpeak(value) {
     console.log(selectedVoice);
@@ -115,8 +112,6 @@ function checkSpeech(){
     }
 }
 
-setInterval("checkSpeech()", 1000);
-
 function selectVoices(){
     const voices = speechSynthesis.getVoices();
     const selectedOption = voiceSelect.selectedOptions[0].getAttribute('data-name');
@@ -152,3 +147,5 @@ function populateVoiceList() {
         }
     }
 }
+
+setInterval("checkSpeech()", 1000);
