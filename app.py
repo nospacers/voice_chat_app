@@ -2,7 +2,7 @@ import openai
 import requests
 import json
 from flask import Flask, request, send_file
-from bs4 import BeautifulSoup
+#from bs4 import BeautifulSoup
 from datetime import date
 from datetime import datetime
 
