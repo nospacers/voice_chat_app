@@ -2,10 +2,16 @@ const synth = window.speechSynthesis;
 const responseContainer = document.getElementById("response");
 const btnenable = document.getElementById("btn-enable");
 const recognition = new webkitSpeechRecognition() || new SpeechRecognition();
+const grammar = '#JSGF V1.0; grammar phrases; public <phrase> = please save the response | do something else;'
+const speechRecognitionList = new webkitSpeechGrammarList();
+speechRecognitionList.addFromString(grammar, 1);
 let finalTranscript = "You: ";
 let recogstatus = 0;
 let selectedVoice = 0;
+let aiResponse = "";
+let aiVoice = "";
 
+recognition.grammars = speechRecognitionList;
 recognition.interimResults = false;
 recognition.maxAlternatives = 10;
 recognition.continuous = true;
@@ -21,8 +27,12 @@ if (typeof speechSynthesis !== "undefined" && speechSynthesis.onvoiceschanged !=
 
 recogstatus = 1;
 recognition.onresult = function(e) {
+    let phrase = "";
     let interimTranscript = "";
     for(let i = e.resultIndex, len = e.results.length; i < len; i++) {
+    phrase = e.results[i][0].transcript;
+    console.log('Confidence: ' + e.results[i][0].confidence);
+    
     let transcript = e.results[i][0].transcript;
         if (e.results[i].isFinal) {
             finalTranscript += transcript;
@@ -44,49 +54,67 @@ recognition.onresult = function(e) {
     });
 
     finalTranscript+=" ";
-
-    // Send the transcript to the Python script
-    fetch("http://localhost:5000/send-text", {
-        method: "POST",
-        mode: "no-cors",
-        headers: new Headers({"Content-Type": "text/html"}),
-        body: finalTranscript
-        })
-        .then(response => {
-            return response.text();
-        })
-        .then(text => {
-            console.log(text);
-            responseContainer.addEventListener("change", aiSpeak(text));
-            finalTranscript += text + " ";
-            if (finalTranscript.length > 3500){
-                finalTranscript = finalTranscript.substring(2000);
-            }
-            console.log(finalTranscript);
-        })
-        .catch(error => console.error(error));  // Log any errors to the console
-        // Update the page with the response from the Python backend
+    
+    if (e.results[0][0].confidence > 0.80 && phrase == "please save the response"){
+        //console.log("I will save the response for you!");
+        writeToFile(aiResponse);
+        aiSpeak("I will save the response.");
+    } else {
+        // Send the transcript to the Python script
+        fetch("http://localhost:5000/send-text", {
+            method: "POST",
+            mode: "no-cors",
+            headers: new Headers({"Content-Type": "text/html"}),
+            body: finalTranscript
+            })
+            .then(response => {
+                return response.text();
+            })
+            .then(text => {
+                console.log(text);
+                responseContainer.addEventListener("change", aiSpeak(text));
+                finalTranscript += text + " ";
+                aiResponse = text;
+                if (finalTranscript.length > 3500){
+                    finalTranscript = finalTranscript.substring(2000);
+                }
+                console.log(finalTranscript);
+            })
+            .catch(error => console.error(error));  // Log any errors to the console
+            // Update the page with the response from the Python backend
     }
+}
+
+recognition.onnomatch = function(e) {
+    console.log = "I didn't recognise that phrase.";
+}
 
 function aiSpeak(value) {
     console.log(selectedVoice);
     setTimeout(() => {
-    const voiceSelected = document.getElementById("voiceSelect").value;
-    const textToSpeak = value;
-    const utterThis = new SpeechSynthesisUtterance(textToSpeak);
-    utterThis.voice = selectedVoice;
-    synth.speak(utterThis);
-    console.log("AI: " + textToSpeak);
-    console.log("Pending: " + synth.pending + " Speaking: " + synth.speaking);
-    console.log("Speech Recognition Disabled for Speech Synthesis");
-    disableSpeech();
-    }, "1000")
+        const voiceSelected = document.getElementById("voiceSelect").value;
+        const textToSpeak = value;
+        const utterThis = new SpeechSynthesisUtterance(textToSpeak);
+        utterThis.voice = selectedVoice;
+        synth.speak(utterThis);
+        console.log("AI: " + textToSpeak);
+        console.log("Pending: " + synth.pending + " Speaking: " + synth.speaking);
+        console.log("Speech Recognition Disabled for Speech Synthesis");
+        disableSpeech();
+    }, "2000")
+}
+
+function writeToFile(textToWrite){
+    let response = textToWrite;
+    localStorage.setItem("AI Response", response);
+    document.getElementById("responseP").innerHTML = document.getElementById("responseP").innerHTML + "<b>AIResp:</b>&nbsp;" + response + "<br><br>";
+    //alert(response);
 }
 
 function enableSpeech(){
     recognition.start();
     console.log("Speech Recognition Enabled");
-    document.getElementById("status").style.backgroundColor = "#008000";
+    document.getElementById("status").style.backgroundColor = "#95fa4d";
 }
 
 function disableSpeech(){
@@ -97,8 +125,12 @@ function disableSpeech(){
 
 function checkSpeech(){
     console.log("Speaking... Status: " + synth.speaking);
+    console.log(selectedVoice);
+    if (aiVoice != ""){
+        selectedVoice = aiVoice;
+    }
     if (synth.speaking){
-        document.getElementById("status").style.backgroundColor = "#ff0000";
+        document.getElementById("status").style.backgroundColor = "#fa5b4d";
     } else if (recogstatus == 0){
         enableSpeech();
     }
@@ -113,6 +145,7 @@ function selectVoices(){
     for (let i = 0; i < voices.length; i++) {
         if (voices[i].name === selectedOption) {
             selectedVoice = voices[i];
+            aiVoice = voices[i];
         }
     }
 }
