@@ -11,8 +11,9 @@
 <div id="container" class="responseBx" style="width: 80%; height: 100vh; float: left;">
   <div><select id="voiceSelect" class="spec" onchange="selectVoices()" style="width: 100%;"></select></div>
   <p id="status" class="mn-font" style="height: 20vh; background-color: #000000;"></p>
-  <button id="btn-enable" class="button-29" style="width: 100%; height: 40vh;">&#9654;</button>
-  <button id="btn-reset" class="button-29" style="width: 100%; height: 40vh;" onclick="location.reload()"><span class="flip-text">&#8634;</span></button>
+  <button id="btn-enable" class="button-29" style="width: 100%; height: 30vh;" title="Enable Speech Recognition">&#9654;</button>
+  <button id="btn-clear" class="button-29" style="width: 100%; height: 25vh;" title="Reset Conversation">&#9114;</button>
+  <button id="btn-reset" class="button-29" style="width: 100%; height: 25vh;" title="Reload Page" onclick="location.reload()"><span class="flip-text">&#8634;</span></button>
   <div id="response"></div>
 </div>
 <div id="reponseBox" class="responseBx" style="width: 19%; height: 105vh; float: right; font-family: arial; font-size: 8pt; color: #ffd500;"><h3 style="padding-left: 10px;">Saved AI Reponses</h3><br><p id="responseP" style="padding-left: 10px;"></p></div>
@@ -21,4 +22,3 @@
 <script type="text/javascript" src="/static/app.js"></script>
 </body>
 </html>
-

@@ -1,24 +1,35 @@
 const synth = window.speechSynthesis;
 const responseContainer = document.getElementById("response");
 const btnenable = document.getElementById("btn-enable");
+const btnclear = document.getElementById("btn-clear");
 const recognition = new webkitSpeechRecognition() || new SpeechRecognition();
 const grammar = '#JSGF V1.0; grammar phrases; public <phrase> = please save the response | do something else;'
 const speechRecognitionList = new webkitSpeechGrammarList();
 speechRecognitionList.addFromString(grammar, 1);
-let finalTranscript = "You: ";
+if(localStorage.getItem('AI')){
+    var localS = localStorage.getItem('AI');
+}
+else {
+    var localS = '';
+}
+var localS = localStorage.getItem('AI');
+let finalTranscript = "Prompt: " + localS + "You: ";
 let recogstatus = 0;
 let selectedVoice = 0;
 let aiResponse = "";
 let aiVoice = "";
+//localStorage.setItem('AI', '');
+console.log(localS);
 
 recognition.grammars = speechRecognitionList;
 recognition.interimResults = false;
 recognition.maxAlternatives = 10;
-recognition.continuous = true;
+recognition.continuous = false;
 recognition.autoGainControl = true;
 recognition.noiseSuppression = true;
 
 btnenable.addEventListener("click", enableSpeech);
+btnclear.addEventListener("click", clearCache);
 
 populateVoiceList();
 if (typeof speechSynthesis !== "undefined" && speechSynthesis.onvoiceschanged !== undefined) {
@@ -102,11 +113,11 @@ function aiSpeak(value) {
         console.log("Speech Recognition Disabled for Speech Synthesis");
         disableSpeech();
     }, "2000")
+    localStorage.setItem('AI', value);
 }
 
 function writeToFile(textToWrite){
     let response = textToWrite;
-    localStorage.setItem("AI Response", response);
     document.getElementById("responseP").innerHTML = document.getElementById("responseP").innerHTML + "<b>AIResp:</b>&nbsp;" + response + "<br><br>";
     //alert(response);
 }
@@ -173,6 +184,10 @@ function populateVoiceList() {
             selectedVoice = voices[i];
         }
     }
+}
+
+function clearCache(){
+    localStorage.setItem('AI', '');
 }
 
 setInterval("checkSpeech()", 1000);
